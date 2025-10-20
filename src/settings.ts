@@ -1,13 +1,16 @@
-import { PluginSettingTab, App, ButtonComponent, Notice } from "obsidian";
+import { PluginSettingTab, App, ButtonComponent, Notice, Setting } from "obsidian";
 import ObsidianSpotifyPlugin from "main";
 import { getToken, clearToken } from "tokenStorage";
 import { SpotifyProfile, fetchProfile } from "spotifyAPI";
 import SpotifyUserSVG from "./spotify-user.svg";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ObsidianSpotifyPluginSettings {}
+export interface ObsidianSpotifyPluginSettings {
+  showArtists: boolean;
+}
 
-export const DEFAULT_SETTINGS: ObsidianSpotifyPluginSettings = {};
+export const DEFAULT_SETTINGS: ObsidianSpotifyPluginSettings = {
+  showArtists: false,
+};
 
 export class SettingTab extends PluginSettingTab {
   plugin: ObsidianSpotifyPlugin;
@@ -36,8 +39,22 @@ export class SettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
+    // Song link display settings
+    containerEl.createEl("h3", { text: "Song Link Display" });
+    new Setting(containerEl)
+      .setName("Include artist(s) in song links")
+      .setDesc("Display the artist/band name(s) before the song title in the generated link")
+      .addToggle(toggle =>
+        toggle
+          .setValue(this.plugin.settings.showArtists)
+          .onChange(async value => {
+            this.plugin.settings.showArtists = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
     // Title for the settings page
-    containerEl.createEl("h2", { text: "Manage your connection to Spotify" });
+    containerEl.createEl("h3", { text: "Manage your connection to Spotify" });
 
     // Vertical stacked container for UI
     const stack = containerEl.createDiv({ cls: "stack" });

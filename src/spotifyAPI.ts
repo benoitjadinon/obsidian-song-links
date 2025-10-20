@@ -114,7 +114,7 @@ export const refreshToken = async (
 };
 
 /** Return type for a song fetched from spotify */
-export type Song = { link: string; name: string };
+export type Song = { link: string; name: string; artists: string[] };
 
 /**
  * Fetch the current playing song from spotify. Undefined if nothing playing or an error occurred.
@@ -135,7 +135,12 @@ export const fetchCurrentSong = async (
     try {
       const obj = res.json;
       if (obj.is_playing) {
-        return { link: obj.item?.external_urls.spotify, name: obj.item?.name };
+        const artists = obj.item?.artists?.map((artist: any) => artist.name) || [];
+        return {
+          link: obj.item?.external_urls.spotify,
+          name: obj.item?.name,
+          artists: artists
+        };
       }
     } catch (e: unknown) {
       console.error("Failed to parse response json in fetchCurrentSong: ", e);

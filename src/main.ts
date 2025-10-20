@@ -143,6 +143,10 @@ export default class ObsidianSpotifyPlugin extends Plugin {
 
   /** Build a MD link to the song including attribution */
   buildSongLink = (song: Song) => {
+    if (this.settings.showArtists && song.artists.length > 0) {
+      const artistText = song.artists.join(", ");
+      return `[${artistText} - ${song.name} on Spotify](${song.link})`;
+    }
     return `[${song.name} on Spotify](${song.link})`;
   };
 
